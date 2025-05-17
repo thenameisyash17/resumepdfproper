@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fresher Resume Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: linear-gradient(to right, #f0f2f5, #e0e7ff);
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      flex-direction: row;
+    }
+    .form-section {
+      width: 40%;
+      padding: 20px;
+      background: #ffffff;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    .preview-section {
+      width: 60%;
+      padding: 20px;
+      background: #f9fafb;
+      overflow-y: auto;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    input:focus, textarea:focus {
+      border-color: #6366f1;
+      outline: none;
+    }
+    h2, h3 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .resume {
+      background: white;
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 794px; /* A4 width in px */
+      min-height: 1123px; /* A4 height */
+      margin: auto;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #6366f1;
+      color: white;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    #previewPic {
+      display: none;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+    .resume-section {
+      margin-bottom: 20px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .theme-toggle {
+      margin-bottom: 20px;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+    @media screen and (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .form-section, .preview-section {
+        width: 100%;
+      }
+      .resume {
+        transform: scale(0.95);
+        transform-origin: top left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-section">
+      <div class="theme-toggle">
+        <label for="themeSwitch">🌗 Toggle Dark Mode</label>
+        <input type="checkbox" id="themeSwitch">
+      </div>
+      <h2>Fresher Resume Builder</h2>
+      <input type="text" id="fullName" placeholder="Full Name" />
+      <input type="file" id="profilePic" accept="image/*" />
+      <input type="text" id="phone" placeholder="Phone Number" />
+      <input type="email" id="email" placeholder="Email" />
+      <textarea id="address" placeholder="Address"></textarea>
+      <textarea id="summary" placeholder="Career Objective"></textarea>
+      <h3>Education</h3>
+      <textarea id="education" placeholder="e.g. Diploma in CS - XYZ College"></textarea>
+      <h3>Academic Projects</h3>
+      <textarea id="projects" placeholder="e.g. Online Voting System"></textarea>
+      <h3>Skills</h3>
+      <input type="text" id="skills" placeholder="e.g. HTML, CSS, JavaScript" />
+      <h3>Certifications</h3>
+      <textarea id="experience" placeholder="e.g. Python Certification"></textarea>
+      <h3>Hobbies</h3>
+      <input type="text" id="hobbies" placeholder="e.g. Reading, Drawing" />
+      <p class="note">📱 For best PDF results, use a desktop or laptop.</p>
+      <div class="button-group">
+        <button onclick="exportPDF()">Export to PDF</button>
+        <button onclick="window.print()">Print</button>
+        <button onclick="clearForm()">Reset</button>
+      </div>
+    </div>
+    <div class="preview-section">
+      <div class="resume" id="resumePreview">
+        <div class="resume-section">
+          <h2 id="previewName">Your Name</h2>
+          <img id="previewPic" src="" width="100" height="100">
+        </div>
+        <div class="resume-section">
+          <p><strong>Phone:</strong> <span id="previewPhone"></span></p>
+          <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+          <p><strong>Address:</strong> <span id="previewAddress"></span></p>
+        </div>
+        <div class="resume-section">
+          <p><strong>Career Objective:</strong> <span id="previewSummary"></span></p>
+        </div>
+        <div class="resume-section">
+          <h3>Education</h3>
+          <ul id="previewEducation"></ul>
+        </div>
+        <div class="resume-section">
+          <h3>Academic Projects</h3>
+          <p id="previewProjects"></p>
+        </div>
+        <div class="resume-section">
+          <h3>Skills</h3>
+          <ul id="previewSkills"></ul>
+        </div>
+        <div class="resume-section">
+          <h3>Certifications</h3>
+          <ul id="previewExperience"></ul>
+        </div>
+        <div class="resume-section">
+          <h3>Hobbies</h3>
+          <p id="previewHobbies"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    const inputs = ["fullName", "phone", "email", "address", "summary", "education", "experience", "skills", "projects", "hobbies"];
+    inputs.forEach(id => {
+      document.getElementById(id).addEventListener("input", updateResume);
+    });
+
+    document.getElementById("profilePic").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = document.getElementById("previewPic");
+          img.src = event.target.result;
+          img.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function updateResume() {
+      document.getElementById("previewName").innerText = document.getElementById("fullName").value;
+      document.getElementById("previewPhone").innerText = document.getElementById("phone").value;
+      document.getElementById("previewEmail").innerText = document.getElementById("email").value;
+      document.getElementById("previewAddress").innerText = document.getElementById("address").value;
+      document.getElementById("previewSummary").innerText = document.getElementById("summary").value;
+      document.getElementById("previewEducation").innerHTML = document.getElementById("education").value.split("\n").map(e => `<li>${e}</li>`).join("");
+      document.getElementById("previewExperience").innerHTML = document.getElementById("experience").value.split("\n").map(e => `<li>${e}</li>`).join("");
+      document.getElementById("previewSkills").innerHTML = document.getElementById("skills").value.split(",").map(e => `<li>${e.trim()}</li>`).join("");
+      document.getElementById("previewProjects").innerText = document.getElementById("projects").value;
+      document.getElementById("previewHobbies").innerText = document.getElementById("hobbies").value;
+    }
+
+    function exportPDF() {
+      const resume = document.getElementById("resumePreview");
+      resume.style.transform = "none";
+      resume.style.width = "794px";
+
+      const opt = {
+        margin: [30, 30, 30, 30],
+        filename: 'resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, windowWidth: 794 },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(resume).save().then(() => {
+        if (window.innerWidth < 768) {
+          resume.style.transform = "scale(0.95)";
+          resume.style.transformOrigin = "top left";
+        }
+      });
+    }
+
+    function clearForm() {
+      inputs.forEach(id => document.getElementById(id).value = "");
+      updateResume();
+    }
+
+    document.getElementById("themeSwitch").addEventListener("change", function () {
+      const form = document.querySelector('.form-section');
+      if (this.checked) {
+        document.body.style.background = '#111827';
+        form.style.background = '#1f2937';
+        form.style.color = '#f3f4f6';
+        document.querySelector('.preview-section').style.background = '#1e293b';
+        document.querySelector('.preview-section').style.color = '#f3f4f6';
+        document.querySelector('.resume').style.background = '#111827';
+        document.querySelector('.resume').style.color = '#f3f4f6';
+        document.getElementById("previewPic").style.border = "2px solid #f3f4f6";
+      } else {
+        document.body.style.background = '';
+        form.style.background = '#ffffff';
+        form.style.color = '';
+        document.querySelector('.preview-section').style.background = '#f9fafb';
+        document.querySelector('.preview-section').style.color = '';
+        document.querySelector('.resume').style.background = 'white';
+        document.querySelector('.resume').style.color = '#333';
+        document.getElementById("previewPic").style.border = "none";
+      }
+    });
+  </script>
+</body>
+</html>
